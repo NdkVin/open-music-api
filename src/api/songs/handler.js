@@ -7,8 +7,10 @@ class SongsHandler {
     this._validator = validator;
 
     this.postSongHandler = this.postSongHandler.bind(this);
+    this.getSongsHandler = this.getSongsHandler.bind(this);
   }
 
+  // post song
   async postSongHandler(req, h) {
     try {
       this._validator.validateSongPayload(req.payload);
@@ -45,6 +47,17 @@ class SongsHandler {
       response.code(500);
       return response;
     }
+  }
+
+  // get all songs
+  async getSongsHandler() {
+    const songs = await this._services.getSongs();
+    return {
+      status: 'success',
+      data: {
+        songs,
+      },
+    };
   }
 }
 
