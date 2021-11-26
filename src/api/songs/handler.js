@@ -8,7 +8,7 @@ class SongsHandler {
 
     this.postSongHandler = this.postSongHandler.bind(this);
     this.getSongsHandler = this.getSongsHandler.bind(this);
-    this.getSongsByIdHandler = this.getSongsByIdHandler.bind(this);
+    this.getSongByIdHandler = this.getSongByIdHandler.bind(this);
   }
 
   // post song
@@ -62,7 +62,7 @@ class SongsHandler {
   }
 
   // get song by id
-  async getSongsByIdHandler(req, h) {
+  async getSongByIdHandler(req, h) {
     try {
       const { songId } = req.params;
       const song = await this._services.getSongById(songId);
