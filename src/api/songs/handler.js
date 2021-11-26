@@ -11,6 +11,7 @@ class SongsHandler {
     this.getSongsHandler = this.getSongsHandler.bind(this);
     this.getSongByIdHandler = this.getSongByIdHandler.bind(this);
     this.putSongbyIdHandler = this.putSongbyIdHandler.bind(this);
+    this.deleteSongByIdHandler = this.deleteSongByIdHandler.bind(this);
   }
 
   // post song
@@ -127,6 +128,32 @@ class SongsHandler {
       const response = h.response({
         status: 'fail',
         message: 'Server error',
+      });
+      response.code(500);
+      return response;
+    }
+  }
+
+  async deleteSongByIdHandler(req, h) {
+    try {
+      await this._services.deleteSongById(req.params);
+      return {
+        status: 'success',
+        message: 'lagu berhasil dihapus',
+      };
+    } catch (e) {
+      if (e instanceof ClientError) {
+        const response = h.response({
+          status: 'fail',
+          message: e.message,
+        });
+        response.code(404);
+        return response;
+      }
+
+      const response = h.response({
+        status: 'fail',
+        message: e.message,
       });
       response.code(500);
       return response;
