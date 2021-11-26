@@ -1,4 +1,5 @@
 const ClientError = require('../../exceptions/ClientError');
+const NotFoundError = require('../../exceptions/NotFoundError');
 
 /* eslint-disable class-methods-use-this */
 class SongsHandler {
@@ -9,6 +10,7 @@ class SongsHandler {
     this.postSongHandler = this.postSongHandler.bind(this);
     this.getSongsHandler = this.getSongsHandler.bind(this);
     this.getSongByIdHandler = this.getSongByIdHandler.bind(this);
+    this.putSongbyIdHandler = this.putSongbyIdHandler.bind(this);
   }
 
   // post song
@@ -86,6 +88,45 @@ class SongsHandler {
       const response = h.response({
         status: 'fail',
         message: e.message,
+      });
+      response.code(500);
+      return response;
+    }
+  }
+
+  // put song by id
+  async putSongbyIdHandler(req, h) {
+    try {
+      const { songId } = req.params;
+      this._validator.validateSongPayload(req.payload);
+
+      await this._services.editSongById(songId, req.payload);
+      return {
+        status: 'success',
+        message: 'lagu berhasil diperbarui',
+      };
+    } catch (e) {
+      if (e instanceof NotFoundError) {
+        const response = h.response({
+          status: 'fail',
+          message: e.message,
+        });
+        response.code(404);
+        return response;
+      }
+
+      if (e instanceof ClientError) {
+        const response = h.response({
+          status: 'fail',
+          message: e.message,
+        });
+        response.code(e.statusCode);
+        return response;
+      }
+
+      const response = h.response({
+        status: 'fail',
+        message: 'Server error',
       });
       response.code(500);
       return response;

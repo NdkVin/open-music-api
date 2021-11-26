@@ -36,6 +36,7 @@ class SongsService {
     return songs.rows.map(mapDbToModel);
   }
 
+  // get song by id
   async getSongById(songId) {
     const query = {
       text: 'SELECT * FROM songs WHERE id = $1',
@@ -48,6 +49,23 @@ class SongsService {
       throw new NotFoundError('Song not found');
     }
     return song.rows.map(mapDbToModel)[0];
+  }
+
+  async editSongById(songId, payload) {
+    const {
+      title, year, performer, genre, duration,
+    } = payload;
+    const updatedAt = new Date().toISOString();
+    const query = {
+      text: 'UPDATE songs SET title = $1, year = $2, performer = $3, genre = $4, duration = $5, updated_at = $6 WHERE id = $7 RETURNING id',
+      values: [title, year, performer, genre, duration, updatedAt, songId],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rows.length) {
+      throw new NotFoundError('Data gagal diperbarui');
+    }
   }
 }
 
