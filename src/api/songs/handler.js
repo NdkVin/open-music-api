@@ -8,6 +8,7 @@ class SongsHandler {
 
     this.postSongHandler = this.postSongHandler.bind(this);
     this.getSongsHandler = this.getSongsHandler.bind(this);
+    this.getSongsByIdHandler = this.getSongsByIdHandler.bind(this);
   }
 
   // post song
@@ -58,6 +59,37 @@ class SongsHandler {
         songs,
       },
     };
+  }
+
+  // get song by id
+  async getSongsByIdHandler(req, h) {
+    try {
+      const { songId } = req.params;
+      const song = await this._services.getSongById(songId);
+
+      return {
+        status: 'success',
+        data: {
+          song,
+        },
+      };
+    } catch (e) {
+      if (e instanceof ClientError) {
+        const response = h.response({
+          status: 'fail',
+          message: e.message,
+        });
+        response.code(404);
+        return response;
+      }
+
+      const response = h.response({
+        status: 'fail',
+        message: e.message,
+      });
+      response.code(500);
+      return response;
+    }
   }
 }
 
