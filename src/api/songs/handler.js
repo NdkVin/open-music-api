@@ -45,7 +45,7 @@ class SongsHandler {
       }
 
       const response = h.response({
-        status: 'fail',
+        status: 'error',
         message: e.message,
       });
       response.code(500);
@@ -87,7 +87,7 @@ class SongsHandler {
       }
 
       const response = h.response({
-        status: 'fail',
+        status: 'error',
         message: e.message,
       });
       response.code(500);
@@ -126,7 +126,7 @@ class SongsHandler {
       }
 
       const response = h.response({
-        status: 'fail',
+        status: 'error',
         message: 'Server error',
       });
       response.code(500);
@@ -152,7 +152,7 @@ class SongsHandler {
       }
 
       const response = h.response({
-        status: 'fail',
+        status: 'error',
         message: e.message,
       });
       response.code(500);
