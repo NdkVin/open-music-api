@@ -1,11 +1,21 @@
-const SongsHandler = require('./handler');
+const AuthenticationsHandler = require('./handler');
 const routes = require('./routes');
 
 module.exports = {
-  name: 'songs',
+  name: 'authentications',
   version: '1.0.0',
-  register: async (server, { service, validator }) => {
-    const songHandler = new SongsHandler(service, validator);
-    server.route(routes(songHandler));
+  register: async (server, {
+    authenticationsService,
+    usersService,
+    tokenManager,
+    validator,
+  }) => {
+    const authenticationsHandler = new AuthenticationsHandler(
+      authenticationsService,
+      usersService,
+      tokenManager,
+      validator,
+    );
+    server.route(routes(authenticationsHandler));
   },
 };
