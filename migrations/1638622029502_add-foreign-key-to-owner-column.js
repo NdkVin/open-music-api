@@ -7,5 +7,5 @@ exports.up = (pgm) => {
 };
 
 exports.down = (pgm) => {
-  pgm.addConstraint('playlists', 'fk_playlist.owner_users.id');
+  pgm.dropConstraint('playlists', 'fk_playlist.owner_users.id');
 };
