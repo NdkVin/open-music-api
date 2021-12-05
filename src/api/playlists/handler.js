@@ -9,6 +9,7 @@ class PlaylistsHandler {
     this.getPlaylistHandler = this.getPlaylistHandler.bind(this);
     this.deletePlaylistByIdHandler = this.deletePlaylistByIdHandler.bind(this);
     this.postSongToPlaylistHandler = this.postSongToPlaylistHandler.bind(this);
+    this.getSongsOnPlaylistHandler = this.getSongsOnPlaylistHandler.bind(this);
   }
 
   async postPlaylistHandler({ payload, auth }, h) {
@@ -124,6 +125,39 @@ class PlaylistsHandler {
       });
       response.code(201);
       return response;
+    } catch (e) {
+      if (e instanceof ClientError) {
+        const response = h.response({
+          status: 'fail',
+          message: e.message,
+        });
+        response.code(e.statusCode);
+        return response;
+      }
+
+      const response = h.response({
+        status: 'error',
+        message: e.message,
+      });
+      response.code(500);
+      return response;
+    }
+  }
+
+  async getSongsOnPlaylistHandler({ params, auth }, h) {
+    try {
+      const { id: credentialId } = auth.credentials;
+      const { playlistId } = params;
+
+      await this._service.verifyPlaylistOwner(playlistId, credentialId);
+      const songs = await this._service.getSongsPlaylist(playlistId);
+
+      return {
+        status: 'success',
+        data: {
+          songs,
+        },
+      };
     } catch (e) {
       if (e instanceof ClientError) {
         const response = h.response({

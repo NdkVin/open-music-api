@@ -64,6 +64,16 @@ class PlaylistService {
     return result;
   }
 
+  async getSongsPlaylist(playlistId) {
+    const query = {
+      text: 'SELECT songs.id, songs.title, songs.performer FROM playlists INNER JOIN playlistsongs ON playlists.id=playlistsongs.playlist_id INNER JOIN songs ON playlistsongs.song_id=songs.id WHERE playlists.id = $1',
+      values: [playlistId],
+    };
+
+    const result = await this._pool.query(query);
+    return result.rows;
+  }
+
   async verifyPlaylistOwner(playlistId, owner) {
     const query = {
       text: 'SELECT * FROM playlists where id = $1',
