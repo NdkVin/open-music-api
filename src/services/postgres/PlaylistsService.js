@@ -74,6 +74,18 @@ class PlaylistService {
     return result.rows;
   }
 
+  async deleteSongsOnPlaylist(songId, playlistId) {
+    const query = {
+      text: 'DELETE FROM playlistsongs WHERE playlist_id = $1 AND song_id = $2 RETURNING id',
+      values: [playlistId, songId],
+    };
+
+    const result = await this._pool.query(query);
+    if (!result.rowCount) {
+      throw new InvariantError('Tidak dapat menghapus lagu dari playlist');
+    }
+  }
+
   async verifyPlaylistOwner(playlistId, owner) {
     const query = {
       text: 'SELECT * FROM playlists where id = $1',
