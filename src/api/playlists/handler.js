@@ -117,7 +117,7 @@ class PlaylistsHandler {
       const { id: credentialId } = auth.credentials;
       const { songId } = payload;
 
-      await this._service.verifyPlaylistOwner(playlistId, credentialId);
+      await this._service.verifyPlaylistAccess(playlistId, credentialId);
       await this._service.addSongToPlaylist(playlistId, songId);
 
       const response = h.response({
@@ -150,7 +150,7 @@ class PlaylistsHandler {
       const { id: credentialId } = auth.credentials;
       const { playlistId } = params;
 
-      await this._service.verifyPlaylistOwner(playlistId, credentialId);
+      await this._service.verifyPlaylistAccess(playlistId, credentialId);
       const songs = await this._service.getSongsPlaylist(playlistId);
 
       return {
@@ -186,12 +186,12 @@ class PlaylistsHandler {
       const { playlistId } = params;
       const { id: credentialId } = auth.credentials;
 
-      await this._service.verifyPlaylistOwner(playlistId, credentialId);
+      await this._service.verifyPlaylistAccess(playlistId, credentialId);
       await this._service.deleteSongsOnPlaylist(songId, playlistId);
 
       return {
         status: 'success',
-        message: 'Lagu berhasil dihapus dari playlist',
+        message: 'lagu berhasil dihapus dari palylist',
       };
     } catch (e) {
       if (e instanceof ClientError) {

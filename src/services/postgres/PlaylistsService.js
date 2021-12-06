@@ -5,7 +5,8 @@ const NotFoundError = require('../../exceptions/NotFoundError');
 const AuthorizationError = require('../../exceptions/AuthorizationError');
 
 class PlaylistService {
-  constructor() {
+  constructor(collaborationsService) {
+    this._collaborationsService = collaborationsService;
     this._pool = new Pool();
   }
 
@@ -27,7 +28,7 @@ class PlaylistService {
 
   async getPlaylists(owner) {
     const query = {
-      text: 'SELECT playlists.id, playlists.name, users.username FROM playlists LEFT JOIN users ON playlists.owner=users.id WHERE playlists.owner = $1',
+      text: 'SELECT playlists.id, playlists.name, users.username FROM playlists LEFT JOIN users ON playlists.owner=users.id LEFT JOIN collaborations ON collaborations.playlist_id = playlists.id WHERE playlists.owner = $1 OR collaborations.user_id = $1',
       values: [owner],
     };
 
@@ -66,8 +67,7 @@ class PlaylistService {
 
   async getSongsPlaylist(playlistId) {
     const query = {
-      text: 'SELECT songs.id, songs.title, songs.performer FROM playlists INNER JOIN playlistsongs ON playlists.id=playlistsongs.playlist_id INNER JOIN songs ON playlistsongs.song_id=songs.id WHERE playlists.id = $1',
-      values: [playlistId],
+      text: 'SELECT songs.id, songs.title, songs.performer FROM playlists INNER JOIN playlistsongs ON playlists.id = playlistsongs.playlist_id INNER JOIN songs ON songs.id = playlistsongs.song_id WHERE playlists.id = $1', values: [playlistId],
     };
 
     const result = await this._pool.query(query);
@@ -99,7 +99,23 @@ class PlaylistService {
     }
 
     if (result.rows[0].owner !== owner) {
-      throw new AuthorizationError('Anda tidak berhak menghapus ini');
+      throw new AuthorizationError('Anda tidak berhak melakukan ini');
+    }
+  }
+
+  async verifyPlaylistAccess(playlistId, owner) {
+    try {
+      await this.verifyPlaylistOwner(playlistId, owner);
+    } catch (e) {
+      if (e instanceof NotFoundError) {
+        throw e;
+      }
+
+      try {
+        await this._collaborationsService.verifyCollaboration(playlistId, owner);
+      } catch {
+        throw e;
+      }
     }
   }
 }
